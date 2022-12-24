@@ -7,5 +7,5 @@ echo 'app';
 $test = new TestClass();
 $test->testEcho();
 // include '/test.php';
-xdebug_info();
+// xdebug_info();
 phpinfo();
