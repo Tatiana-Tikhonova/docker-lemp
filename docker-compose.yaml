@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  php:
+    build:
+      context: ./docker
+    volumes:
+        - './app:/var/www/app'
+        - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    working_dir: /var/www/app
+    expose:
+      - 9000
+  
+  nginx:
+    image: nginx:latest
+    ports:
+      - 88:80
+    depends_on:
+      - php
+    volumes:
+      - './app:/var/www/app'
+      - './docker/nginx/conf.d:/etc/nginx/conf.d'
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: lempDb
+      MYSQL_USER: lemp
+      MYSQL_PASSWORD: lemp
+    volumes:
+      - './docker/volumes/mysql:/var/lib/mysql'
+
+  #postgres:
+  #  image: postgres:latest
+  #  restart: always
+  #  ports: 
+  #    - "5432:5432"
+  #  environment:
+  #    - POSTGRES_DB=root
+  #    - POSTGRES_USER=root
+  #    - POSTGRES_PASSWORD=root
+  #  volumes:
+  #     - ./docker/volumes/postgres:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - 82:8080
+    depends_on:
+      - mysql
+  #    - postgres
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+      ADMINER_DEFAULT_DB_DRIVER: mysql
+      ADMINER_DEFAULT_DB_HOST: mysql
+  #    ADMINER_DEFAULT_SERVER: postgres
+  #    ADMINER_DEFAULT_DB_DRIVER: postgres
+  #    ADMINER_DEFAULT_DB_HOST: postgres
